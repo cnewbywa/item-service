@@ -7,7 +7,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import com.cnewbywa.item.model.Item;
 import com.cnewbywa.item.service.ItemService;
@@ -20,28 +24,33 @@ public class ItemController {
 	@Autowired
 	private ItemService itemService;
 	
-	@GetMapping
+	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
 	public Item getIrem(@Nonnull Long id) {
 		return itemService.getItem(id);
 	}
 	
-	@GetMapping
+	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
 	public Page<Item> getItems(Pageable pageable) {
 		return itemService.getItems(pageable);
 	}
 	
-	@PostMapping
+	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
 	public void addItem(@Nonnull Item item) {
 		itemService.addItem(item);
 	}
 	
-	@PutMapping
-	public void updateItem(@Nonnull Item item) {
+	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public void updateItem(Long id, @Nonnull Item item) {
 		itemService.updateItem(item);
 	}
 	
-	@DeleteMapping
-	public void deleteItem(@Nonnull Long id) {
+	@DeleteMapping(path = "/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deleteItem(Long id) {
 		itemService.deleteItem(id);
 	}
 }
