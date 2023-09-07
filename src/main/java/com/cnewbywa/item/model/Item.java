@@ -22,14 +22,14 @@ public class Item {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Size(min=3, max = 50)
+	@Size(min = 3, max = 50)
 	@NotBlank
 	private String name;
-	@Size(min=3, max = 50)
+	@Size(min = 3, max = 50)
 	@NotBlank
 	private String description;
-	@Column(name="create_time", updatable = false)
+	@Column(name = "create_time", updatable = false)
 	private OffsetDateTime createTime;
-	@Column(name="update_time")
+	@Column(name = "update_time")
 	private OffsetDateTime updateTime;
 }
