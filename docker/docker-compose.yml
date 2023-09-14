@@ -1,0 +1,32 @@
+version: "3.8"
+
+networks:
+    items-network:
+        driver: bridge
+        ipam:
+            driver: default
+            config:
+                - subnet: 172.41.0.0/16
+
+secrets:
+    postgres_password:
+        file: ~/docker/container_configs/postgres_password
+
+services:
+    # postgres db
+    postgres:
+        image: postgres:15.4-alpine
+        networks:
+            items-network:
+                ipv4_address: 172.41.0.2
+        volumes:
+            - ~/docker/container_storage/item/db:/var/lib/postgresql/data
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        ports:
+            - 5432:5432
+        secrets:
+            - postgres_password
+        environment:
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
