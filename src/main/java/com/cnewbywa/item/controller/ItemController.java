@@ -41,11 +41,13 @@ public class ItemController {
 	}
 	
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<ItemResponseDto> addItem(@RequestBody @Nonnull ItemDto item) {
 		return new ResponseEntity<>(itemService.addItem(item), HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<ItemResponseDto> updateItem(@PathVariable Long id, @RequestBody @Nonnull ItemDto item) {
 		return ResponseEntity.ok(itemService.updateItem(id, item));
 	}
