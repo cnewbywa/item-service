@@ -1,5 +1,6 @@
 package com.cnewbywa.item.service;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
+import com.cnewbywa.item.model.EventMessage;
 import com.cnewbywa.item.model.Item;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
@@ -19,8 +21,15 @@ import com.cnewbywa.item.repository.ItemRepository;
 @Transactional
 public class ItemService {
 
+	static final String EVENT_MESSAGE__ADD = "Item with id {0} was added";
+    static final String EVENT_MESSAGE__MODIFY = "Item with id {0} was modified";
+    static final String EVENT_MESSAGE__DELETE = "Item with id {0} was removed";
+    
 	@Autowired
 	private ItemRepository itemRepository;
+	
+	@Autowired
+    private EventSender eventSender;
 	
 	public ItemResponseDto getItem(Long id) {
 		Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
@@ -39,6 +48,8 @@ public class ItemService {
 	public ItemResponseDto addItem(ItemDto itemDto) {
 		Item item = itemRepository.save(Item.builder().name(itemDto.getName()).description(itemDto.getDescription()).build());
 		
+		eventSender.sendEvent(item.getId(), MessageFormat.format(EVENT_MESSAGE__ADD, item.getId()), EventMessage.EventMessageAction.ADD);
+		
 		return createResponseDto(item);
 	}
 	
@@ -50,11 +61,15 @@ public class ItemService {
 		
 		Item item = itemRepository.save(dbItem);
 		
+		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__MODIFY, id), EventMessage.EventMessageAction.MODIFY);
+		
 		return createResponseDto(item);
 	}
 	
 	public void deleteItem(Long id) {
 		itemRepository.deleteById(id);
+		
+		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__DELETE, id), EventMessage.EventMessageAction.DELETE);
 	}
 	
 	private ItemResponseDto createResponseDto(Item item) {

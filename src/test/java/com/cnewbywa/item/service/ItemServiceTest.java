@@ -2,6 +2,7 @@ package com.cnewbywa.item.service;
 
 import org.junit.jupiter.api.Assertions;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
+import com.cnewbywa.item.model.EventMessage;
 import com.cnewbywa.item.model.Item;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
@@ -33,6 +35,9 @@ class ItemServiceTest {
 	
 	@Mock
 	private ItemRepository itemRepository;
+	
+	@Mock
+	private EventSender eventSender;
 	
 	@Test
 	void testGetItem_Success() {
@@ -103,6 +108,7 @@ class ItemServiceTest {
 		Assertions.assertEquals(itemDto.getDescription(), response.getDescription());
 		
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
+		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__ADD, 1L), EventMessage.EventMessageAction.ADD);
 	}
 	
 	@Test
@@ -126,6 +132,7 @@ class ItemServiceTest {
 		
 		Mockito.verify(itemRepository).findById(1L);
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
+		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__MODIFY, 1L), EventMessage.EventMessageAction.MODIFY);
 	}
 	
 	@Test
@@ -137,6 +144,8 @@ class ItemServiceTest {
 		});
 		
 		Mockito.verify(itemRepository).findById(1L);
+		Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any(Item.class));
+		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyLong(), Mockito.anyString(), Mockito.any());
 	}
 	
 	@Test
@@ -144,5 +153,6 @@ class ItemServiceTest {
 		itemService.deleteItem(1L);
 		
 		Mockito.verify(itemRepository).deleteById(1L);
+		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, 1L), EventMessage.EventMessageAction.DELETE);
 	}
 }
