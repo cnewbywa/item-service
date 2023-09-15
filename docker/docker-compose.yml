@@ -30,3 +30,13 @@ services:
             - POSTGRES_DB=postgres
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_password
+
+    # redis cache
+    redis:
+        image: redis:7.2
+        networks:
+            items-network:
+                ipv4_address: 172.41.0.3
+        ports:
+            - 6379:6379
+        

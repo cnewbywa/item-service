@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,14 @@ public class ItemService {
 	@Autowired
     private EventSender eventSender;
 	
+	@Cacheable("item")
 	public ItemResponseDto getItem(Long id) {
 		Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		return createResponseDto(item);
 	}
 	
+	@Cacheable("items")
 	public ItemListResponseDto getItems(Pageable pageable) {
 		Page<Item> page = itemRepository.findAll(pageable);
 		
@@ -53,6 +57,7 @@ public class ItemService {
 		return createResponseDto(item);
 	}
 	
+	@CacheEvict(value = "item", key = "#id")
 	public ItemResponseDto updateItem(long id, ItemDto itemDto) {
 		Item dbItem = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
@@ -66,6 +71,7 @@ public class ItemService {
 		return createResponseDto(item);
 	}
 	
+	@CacheEvict(value = "item", key = "#id")
 	public void deleteItem(Long id) {
 		itemRepository.deleteById(id);
 		
