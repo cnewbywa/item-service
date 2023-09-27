@@ -23,4 +23,6 @@ public class ItemResponseDto implements Serializable {
 	private String description;
 	private Instant createTime;
 	private Instant updateTime;
+	private String createdBy;
+	private String modifiedBy;
 }

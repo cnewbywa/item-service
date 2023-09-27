@@ -19,8 +19,11 @@ import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
 import com.cnewbywa.item.repository.ItemRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Transactional
+@Slf4j
 public class ItemService {
 
 	static final String EVENT_MESSAGE__ADD = "Item with id {0} was added";
@@ -49,7 +52,9 @@ public class ItemService {
 		return ItemListResponseDto.builder().amount(page.getNumberOfElements()).totalAmount(page.getTotalElements()).items(responses).build();
 	}
 	
-	public ItemResponseDto addItem(ItemDto itemDto) {
+	public ItemResponseDto addItem(ItemDto itemDto, String user) {
+		log.debug("User: " + user);
+		
 		Item item = itemRepository.save(Item.builder().name(itemDto.getName()).description(itemDto.getDescription()).build());
 		
 		eventSender.sendEvent(item.getId(), MessageFormat.format(EVENT_MESSAGE__ADD, item.getId()), EventMessage.EventMessageAction.ADD);
@@ -58,7 +63,7 @@ public class ItemService {
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public ItemResponseDto updateItem(long id, ItemDto itemDto) {
+	public ItemResponseDto updateItem(long id, ItemDto itemDto, String user) {
 		Item dbItem = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		dbItem.setName(itemDto.getName());
@@ -72,7 +77,7 @@ public class ItemService {
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public void deleteItem(Long id) {
+	public void deleteItem(Long id, String user) {
 		itemRepository.deleteById(id);
 		
 		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__DELETE, id), EventMessage.EventMessageAction.DELETE);
@@ -84,6 +89,8 @@ public class ItemService {
 				.name(item.getName())
 				.description(item.getDescription())
 				.createTime(item.getCreateTime())
-				.updateTime(item.getUpdateTime()).build();
+				.updateTime(item.getUpdateTime())
+				.createdBy(item.getCreatedBy())
+				.modifiedBy(item.getModifiedBy()).build();
 	}
 }

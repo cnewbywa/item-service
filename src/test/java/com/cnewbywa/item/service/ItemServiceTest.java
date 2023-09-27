@@ -100,7 +100,7 @@ class ItemServiceTest {
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
-		ItemResponseDto response = itemService.addItem(itemDto);
+		ItemResponseDto response = itemService.addItem(itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1L, response.getId());
@@ -123,7 +123,7 @@ class ItemServiceTest {
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
-		ItemResponseDto response = itemService.updateItem(1L, itemDto);
+		ItemResponseDto response = itemService.updateItem(1L, itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(1L, response.getId());
@@ -140,7 +140,7 @@ class ItemServiceTest {
 		Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.empty());
 		
 		Assertions.assertThrows(ItemNotFoundException.class, () -> {
-			itemService.updateItem(1L, new ItemDto("Item 1", "Description of item 1"));
+			itemService.updateItem(1L, new ItemDto("Item 1", "Description of item 1"), "user1");
 		});
 		
 		Mockito.verify(itemRepository).findById(1L);
@@ -150,7 +150,7 @@ class ItemServiceTest {
 	
 	@Test
 	void testDeleteItem_Success() {
-		itemService.deleteItem(1L);
+		itemService.deleteItem(1L, "user1");
 		
 		Mockito.verify(itemRepository).deleteById(1L);
 		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, 1L), EventMessage.EventMessageAction.DELETE);

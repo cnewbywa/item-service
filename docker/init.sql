@@ -6,5 +6,6 @@ CREATE TABLE item.item (
     description VARCHAR(500),
     create_time TIMESTAMPTZ,
     update_time TIMESTAMPTZ,
+    created_by VARCHAR(75),
+    modified_by VARCHAR(75),
     version serial);
-
