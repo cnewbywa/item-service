@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
@@ -35,7 +34,7 @@ public class ItemController {
 	
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<ItemResponseDto> getIrem(JwtAuthenticationToken jwtAuthenticationToken, @PathVariable Long id) {
+	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable Long id) {
 		return ResponseEntity.ok(itemService.getItem(id));
 	}
 	
