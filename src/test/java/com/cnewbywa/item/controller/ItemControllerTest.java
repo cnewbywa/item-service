@@ -3,6 +3,8 @@ package com.cnewbywa.item.controller;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -115,7 +117,7 @@ class ItemControllerTest {
 		
 		Mockito.when(itemService.addItem(input, "test-user-id")).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.addItem(createAuthentication(), input);
+		ResponseEntity<ItemResponseDto> responseEntity = itemController.addItem(createAuthentication("test-user-id"), input);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
@@ -137,7 +139,7 @@ class ItemControllerTest {
 	@Test
 	void testAddItem_NoLoggedInUser2() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.addItem(new JwtAuthenticationToken(null, null, null), null);
+			itemController.addItem(createAuthentication(null), null);
 	    });
 		
 		Mockito.verify(itemService, Mockito.never()).addItem(Mockito.any(ItemDto.class), Mockito.anyString());
@@ -149,9 +151,9 @@ class ItemControllerTest {
 		
 		ItemDto input = new ItemDto("Item 2", "New description for item 2");
 		
-		Mockito.when(itemService.addItem(input, "test-user-id")).thenReturn(response);
+		Mockito.when(itemService.updateItem(2L, input, "test-user-id")).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.updateItem(createAuthentication(), 2L, input);
+		ResponseEntity<ItemResponseDto> responseEntity = itemController.updateItem(createAuthentication("test-user-id"), 2L, input);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -173,7 +175,7 @@ class ItemControllerTest {
 	@Test
 	void testUpdateItem_NoLoggedInUser2() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.addItem(new JwtAuthenticationToken(null, null, null), null);
+			itemController.addItem(createAuthentication(null), null);
 	    });
 		
 		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyLong(), Mockito.any(ItemDto.class), Mockito.anyString());
@@ -181,11 +183,11 @@ class ItemControllerTest {
 	
 	@Test
 	void testDeleteItem() {
-		Mockito.doNothing().when(itemService).deleteItem(1L, "test-user-id");
+		Mockito.doNothing().when(itemService).deleteItem(2L, "test-user-id");
 		
-		itemController.deleteItem(createAuthentication(), 2L);
+		itemController.deleteItem(createAuthentication("test-user-id"), 2L);
 		
-		Mockito.verify(itemService).deleteItem(1L, "test-user-id");
+		Mockito.verify(itemService).deleteItem(2L, "test-user-id");
 	}
 	
 	@Test
@@ -200,7 +202,7 @@ class ItemControllerTest {
 	@Test
 	void testDeleteItem_NoLoggedInUser2() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.deleteItem(new JwtAuthenticationToken(null, null, null), 1L);
+			itemController.deleteItem(createAuthentication(null), 1L);
 	    });
 		
 		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyLong(), Mockito.anyString());
@@ -212,9 +214,16 @@ class ItemControllerTest {
 		Assertions.assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
 	}
 	
-	private Authentication createAuthentication() {
-		Jwt jwt = new Jwt("", Instant.now(), Instant.now().plusSeconds(60), null, null);
+	private Authentication createAuthentication(String user) {
+		Map<String, Object> headers = new HashMap<>();
+		headers.put("alg", "HS256");
+		headers.put("typ", "JWT");
 		
-		return new JwtAuthenticationToken(jwt, null, "test-user-id");
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("sub", user);
+		
+		Jwt jwt = new Jwt("not empty", Instant.now(), Instant.now().plusSeconds(60), headers, claims);
+		
+		return new JwtAuthenticationToken(jwt, null, user);
 	}
 }
