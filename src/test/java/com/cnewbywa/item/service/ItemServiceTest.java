@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,35 +40,38 @@ class ItemServiceTest {
 	@Mock
 	private EventSender eventSender;
 	
+	private String item1Id = UUID.randomUUID().toString();
+	private String item2Id = UUID.randomUUID().toString();
+	
 	@Test
 	void testGetItem_Success() {
-		Item dbItem = Item.builder().id(1L).build();
+		Item dbItem = Item.builder().itemId(item1Id).build();
 		
-		Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.of(dbItem));
+		Mockito.when(itemRepository.findByItemId(item1Id)).thenReturn(Optional.of(dbItem));
 		
-		ItemResponseDto returnedItem = itemService.getItem(1L);
+		ItemResponseDto returnedItem = itemService.getItem(item1Id);
 		
 		Assertions.assertNotNull(returnedItem);
-		Assertions.assertEquals(1L, returnedItem.getId());
+		Assertions.assertEquals(item1Id, returnedItem.getId());
 			
-		Mockito.verify(itemRepository).findById(1L);
+		Mockito.verify(itemRepository).findByItemId(item1Id);
 	}
 	
 	@Test
 	void testGetItem_Failute() {
-		Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+		Mockito.when(itemRepository.findByItemId(item1Id)).thenReturn(Optional.empty());
 		
 		Assertions.assertThrows(ItemNotFoundException.class, () -> {
-			itemService.getItem(1L);
+			itemService.getItem(item1Id);
 		});
 		
-		Mockito.verify(itemRepository).findById(1L);
+		Mockito.verify(itemRepository).findByItemId(item1Id);
 	}
 	
 	@Test
 	void testGetItems_Success() {
-		Item dbItem = Item.builder().id(1L).build();
-		Item dbItem2 = Item.builder().id(2L).build();
+		Item dbItem = Item.builder().itemId(item1Id).build();
+		Item dbItem2 = Item.builder().itemId(item2Id).build();
 		
 		Mockito.when(itemRepository.findAll(Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>(Arrays.asList(dbItem, dbItem2))));
 		
@@ -96,19 +100,19 @@ class ItemServiceTest {
 		String name = "Item 1";
 		String description = "Description of item 1";
 		
-		Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(Item.builder().id(1L).name(name).description(description).createTime(Instant.now()).build());
+		Mockito.when(itemRepository.save(Mockito.any(Item.class))).thenReturn(Item.builder().itemId(item1Id).name(name).description(description).createTime(Instant.now()).build());
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
 		ItemResponseDto response = itemService.addItem(itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(1L, response.getId());
+		Assertions.assertEquals(item1Id, response.getId());
 		Assertions.assertEquals(itemDto.getName(), response.getName());
 		Assertions.assertEquals(itemDto.getDescription(), response.getDescription());
 		
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__ADD, 1L), EventMessage.EventMessageAction.ADD);
+		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__ADD, item1Id), EventMessage.EventMessageAction.ADD);
 	}
 	
 	@Test
@@ -116,43 +120,43 @@ class ItemServiceTest {
 		String name = "Item 1";
 		String description = "Description of item 1";
 		
-		Item item = Item.builder().id(1L).name(name).description(description).build();
+		Item item = Item.builder().itemId(item1Id).name(name).description(description).build();
 		
-		Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-		Mockito.when(itemRepository.save(item)).thenReturn(Item.builder().id(1L).name(name).description(description).createTime(Instant.now()).build());
+		Mockito.when(itemRepository.findByItemId(item1Id)).thenReturn(Optional.of(item));
+		Mockito.when(itemRepository.save(item)).thenReturn(Item.builder().itemId(item1Id).name(name).description(description).createTime(Instant.now()).build());
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
-		ItemResponseDto response = itemService.updateItem(1L, itemDto, "user1");
+		ItemResponseDto response = itemService.updateItem(item1Id, itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
-		Assertions.assertEquals(1L, response.getId());
+		Assertions.assertEquals(item1Id, response.getId());
 		Assertions.assertEquals(itemDto.getName(), response.getName());
 		Assertions.assertEquals(itemDto.getDescription(), response.getDescription());
 		
-		Mockito.verify(itemRepository).findById(1L);
+		Mockito.verify(itemRepository).findByItemId(item1Id);
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__MODIFY, 1L), EventMessage.EventMessageAction.MODIFY);
+		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__MODIFY, item1Id), EventMessage.EventMessageAction.MODIFY);
 	}
 	
 	@Test
 	void testUpdateItem_Failure_IncorrectId() {
-		Mockito.when(itemRepository.findById(1L)).thenReturn(Optional.empty());
+		Mockito.when(itemRepository.findByItemId(item1Id)).thenReturn(Optional.empty());
 		
 		Assertions.assertThrows(ItemNotFoundException.class, () -> {
-			itemService.updateItem(1L, new ItemDto("Item 1", "Description of item 1"), "user1");
+			itemService.updateItem(item1Id, new ItemDto("Item 1", "Description of item 1"), "user1");
 		});
 		
-		Mockito.verify(itemRepository).findById(1L);
+		Mockito.verify(itemRepository).findByItemId(item1Id);
 		Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyLong(), Mockito.anyString(), Mockito.any());
+		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyString(), Mockito.anyString(), Mockito.any());
 	}
 	
 	@Test
 	void testDeleteItem_Success() {
-		itemService.deleteItem(1L, "user1");
+		itemService.deleteItem(item1Id, "user1");
 		
-		Mockito.verify(itemRepository).deleteById(1L);
-		Mockito.verify(eventSender).sendEvent(1L, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, 1L), EventMessage.EventMessageAction.DELETE);
+		Mockito.verify(itemRepository).deleteByItemId(item1Id);
+		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, item1Id), EventMessage.EventMessageAction.DELETE);
 	}
 }

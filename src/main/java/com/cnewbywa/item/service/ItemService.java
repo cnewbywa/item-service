@@ -37,8 +37,8 @@ public class ItemService {
     private EventSender eventSender;
 	
 	@Cacheable("item")
-	public ItemResponseDto getItem(Long id) {
-		Item item = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+	public ItemResponseDto getItem(String id) {
+		Item item = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		return createResponseDto(item);
 	}
@@ -57,14 +57,14 @@ public class ItemService {
 		
 		Item item = itemRepository.save(Item.builder().name(itemDto.getName()).description(itemDto.getDescription()).build());
 		
-		eventSender.sendEvent(item.getId(), MessageFormat.format(EVENT_MESSAGE__ADD, item.getId()), EventMessage.EventMessageAction.ADD);
+		eventSender.sendEvent(item.getItemId(), MessageFormat.format(EVENT_MESSAGE__ADD, item.getItemId()), EventMessage.EventMessageAction.ADD);
 		
 		return createResponseDto(item);
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public ItemResponseDto updateItem(long id, ItemDto itemDto, String user) {
-		Item dbItem = itemRepository.findById(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
+	public ItemResponseDto updateItem(String id, ItemDto itemDto, String user) {
+		Item dbItem = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		dbItem.setName(itemDto.getName());
 		dbItem.setDescription(itemDto.getDescription());
@@ -77,15 +77,15 @@ public class ItemService {
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public void deleteItem(Long id, String user) {
-		itemRepository.deleteById(id);
+	public void deleteItem(String id, String user) {
+		itemRepository.deleteByItemId(id);
 		
 		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__DELETE, id), EventMessage.EventMessageAction.DELETE);
 	}
 	
 	private ItemResponseDto createResponseDto(Item item) {
 		return ItemResponseDto.builder()
-				.id(item.getId())
+				.id(item.getItemId())
 				.name(item.getName())
 				.description(item.getDescription())
 				.createTime(item.getCreateTime())

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,40 +38,43 @@ class ItemControllerTest {
 	@InjectMocks
 	private ItemController itemController;
 	
+	private String item1Id = UUID.randomUUID().toString();
+	private String item2Id = UUID.randomUUID().toString();
+	
 	@Test
 	void testGetItem_Success() {
-		ItemResponseDto response = ItemResponseDto.builder().id(1L).name("Item 1").description("Description for item 1").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").build();
 		
-		Mockito.when(itemService.getItem(1L)).thenReturn(response);
+		Mockito.when(itemService.getItem(item1Id)).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.getIrem(1L);
+		ResponseEntity<ItemResponseDto> responseEntity = itemController.getIrem(item1Id);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Assertions.assertNotNull(responseEntity.getBody());
 		assertResponseDto(response, responseEntity.getBody());
 		
-		Mockito.verify(itemService).getItem(1L);
+		Mockito.verify(itemService).getItem(item1Id);
 	}
 	
 	@Test
 	void testGetItem_Failure() {
-		Mockito.when(itemService.getItem(1L)).thenThrow(ItemNotFoundException.class);
+		Mockito.when(itemService.getItem(item1Id)).thenThrow(ItemNotFoundException.class);
 		
 		Assertions.assertThrows(ItemNotFoundException.class, () -> {
-			itemService.getItem(1L);
+			itemService.getItem(item1Id);
 	    });
 
 		
-		Mockito.verify(itemService).getItem(1L);
+		Mockito.verify(itemService).getItem(item1Id);
 	}
 	
 	@Test
 	void testGetItems_Success() {
 		Pageable pageable = PageRequest.of(0, 2);
 		
-		ItemResponseDto response = ItemResponseDto.builder().id(1L).name("Item 1").description("Description for item 1").build();
-		ItemResponseDto response2 = ItemResponseDto.builder().id(2L).name("Item 2").description("Description for item 2").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").build();
 		
 		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
 		
@@ -111,7 +115,7 @@ class ItemControllerTest {
 	
 	@Test
 	void testAddItem() {
-		ItemResponseDto response = ItemResponseDto.builder().id(1L).name("Item 2").description("Description for item 2").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 2").description("Description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "Description for item 2");
 		
@@ -147,65 +151,65 @@ class ItemControllerTest {
 	
 	@Test
 	void testUpdateItem() {
-		ItemResponseDto response = ItemResponseDto.builder().id(1L).name("Item 2").description("New description for item 2").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 2").description("New description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "New description for item 2");
 		
-		Mockito.when(itemService.updateItem(2L, input, "test-user-id")).thenReturn(response);
+		Mockito.when(itemService.updateItem(item2Id, input, "test-user-id")).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.updateItem(createAuthentication("test-user-id"), 2L, input);
+		ResponseEntity<ItemResponseDto> responseEntity = itemController.updateItem(createAuthentication("test-user-id"), item2Id, input);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Assertions.assertNotNull(responseEntity.getBody());
 		assertResponseDto(response, responseEntity.getBody());
 		
-		Mockito.verify(itemService).updateItem(2L, input, "test-user-id");
+		Mockito.verify(itemService).updateItem(item2Id, input, "test-user-id");
 	}
 	
 	@Test
 	void testUpdateItem_NoLoggedInUser() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.updateItem(null, 1L, null);
+			itemController.updateItem(null, item1Id, null);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyLong(), Mockito.any(ItemDto.class), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyString(), Mockito.any(ItemDto.class), Mockito.anyString());
 	}
 	
 	@Test
 	void testUpdateItem_NoLoggedInUser2() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.addItem(createAuthentication(null), null);
+			itemController.updateItem(createAuthentication(null), item1Id, null);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyLong(), Mockito.any(ItemDto.class), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyString(), Mockito.any(ItemDto.class), Mockito.anyString());
 	}
 	
 	@Test
 	void testDeleteItem() {
-		Mockito.doNothing().when(itemService).deleteItem(2L, "test-user-id");
+		Mockito.doNothing().when(itemService).deleteItem(item2Id, "test-user-id");
 		
-		itemController.deleteItem(createAuthentication("test-user-id"), 2L);
+		itemController.deleteItem(createAuthentication("test-user-id"), item2Id);
 		
-		Mockito.verify(itemService).deleteItem(2L, "test-user-id");
+		Mockito.verify(itemService).deleteItem(item2Id, "test-user-id");
 	}
 	
 	@Test
 	void testDeleteItem_NoLoggedInUser() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.deleteItem(null, 1L);
+			itemController.deleteItem(null, item1Id);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyLong(), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyString(), Mockito.anyString());
 	}
 	
 	@Test
 	void testDeleteItem_NoLoggedInUser2() {
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
-			itemController.deleteItem(createAuthentication(null), 1L);
+			itemController.deleteItem(createAuthentication(null), item1Id);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyLong(), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyString(), Mockito.anyString());
 	}
 	
 	private void assertResponseDto(ItemResponseDto expectedResponse, ItemResponseDto actualResponse) {

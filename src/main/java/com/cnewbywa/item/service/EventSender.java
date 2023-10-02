@@ -11,5 +11,5 @@ public interface EventSender {
 	 * @param eventMessage
 	 * @param action
 	 */
-	void sendEvent(long id, String eventMessage, EventMessage.EventMessageAction action);
+	void sendEvent(String id, String eventMessage, EventMessage.EventMessageAction action);
 }

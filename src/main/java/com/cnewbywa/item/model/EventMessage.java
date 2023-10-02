@@ -13,7 +13,7 @@ public class EventMessage {
 	    ADD, MODIFY, DELETE; 
 	}
 	
-	private long itemId;
+	private String id;
     private EventMessageAction action;
     private String message;
     private final Instant creationTime = Instant.now();

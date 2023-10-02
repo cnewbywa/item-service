@@ -34,7 +34,7 @@ public class ItemController {
 	
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable Long id) {
+	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable String id) {
 		return ResponseEntity.ok(itemService.getItem(id));
 	}
 	
@@ -52,13 +52,13 @@ public class ItemController {
 	
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable Long id, @RequestBody @Nonnull ItemDto item) {
+	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable String id, @RequestBody @Nonnull ItemDto item) {
 		return ResponseEntity.ok(itemService.updateItem(id, item, getLoggedInUser(authentication)));
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
-	public void deleteItem(Authentication authentication, @PathVariable Long id) {
+	public void deleteItem(Authentication authentication, @PathVariable String id) {
 		itemService.deleteItem(id, getLoggedInUser(authentication));
 	}
 	

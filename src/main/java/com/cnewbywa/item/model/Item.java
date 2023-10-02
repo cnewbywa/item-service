@@ -1,6 +1,7 @@
 package com.cnewbywa.item.model;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -39,6 +40,9 @@ public class Item {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(name = "item_id")
+	@Builder.Default
+	private String itemId = UUID.randomUUID().toString();
 	@Size(min = 3, max = 50)
 	@NotBlank
 	@Setter

@@ -29,11 +29,11 @@ public class EventSenderImpl implements EventSender {
 	
     @Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendEvent(long id, String eventMessage, EventMessage.EventMessageAction action) {
-		sendEvent(EventMessage.builder()
+    public void sendEvent(String id, String eventMessage, EventMessage.EventMessageAction action) {
+    	sendEvent(EventMessage.builder()
                 .message(String.format(eventMessage, id))
                 .action(action)
-                .itemId(id)
+                .id(id)
                 .applicationId(applicationId)
                 .build());
 	}
