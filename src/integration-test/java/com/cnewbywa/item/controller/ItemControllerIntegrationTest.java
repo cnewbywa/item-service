@@ -93,12 +93,8 @@ public class ItemControllerIntegrationTest {
 	@BeforeEach
 	@Transactional
 	void setup() {
-		Item item1 = itemRepository.save(Item.builder().itemId(item1Id).name("Item 1").description("Description for item 1").build());
-	    Item item2 = itemRepository.save(Item.builder().itemId(item2Id).name("Item 2").description("Description for item 2").build());
-	    
-	    Optional<Item> item = itemRepository.findByItemId(item2Id);
-	    
-	    String str = "";
+		itemRepository.save(Item.builder().itemId(item1Id).name("Item 1").description("Description for item 1").build());
+	    itemRepository.save(Item.builder().itemId(item2Id).name("Item 2").description("Description for item 2").build());
 	}
 	
 	@AfterEach
