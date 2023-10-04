@@ -93,8 +93,12 @@ public class ItemControllerIntegrationTest {
 	@BeforeEach
 	@Transactional
 	void setup() {
-		itemRepository.save(Item.builder().itemId(item1Id).name("Item 1").description("Description for item 1").build());
-	    itemRepository.save(Item.builder().itemId(item2Id).name("Item 2").description("Description for item 2").build());
+		Item item1 = itemRepository.save(Item.builder().itemId(item1Id).name("Item 1").description("Description for item 1").build());
+	    Item item2 = itemRepository.save(Item.builder().itemId(item2Id).name("Item 2").description("Description for item 2").build());
+	    
+	    Optional<Item> item = itemRepository.findByItemId(item2Id);
+	    
+	    String str = "";
 	}
 	
 	@AfterEach
@@ -110,8 +114,11 @@ public class ItemControllerIntegrationTest {
 		mockMvc
 			.perform(get("/" + item1Id).secure(true))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(item1Id))
 			.andExpect(jsonPath("$.name").value("Item 1"))
-			.andExpect(jsonPath("$.description").value("Description for item 1"));
+			.andExpect(jsonPath("$.description").value("Description for item 1"))
+			.andExpect(jsonPath("$.createTime").isNotEmpty())
+			.andExpect(jsonPath("$.createdBy").value("user"));
 	}
 	
 	@Test
@@ -130,8 +137,10 @@ public class ItemControllerIntegrationTest {
 		mockMvc
 			.perform(get("").secure(true))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].id").value(item1Id))
 			.andExpect(jsonPath("$.items[0].name").value("Item 1"))
 			.andExpect(jsonPath("$.items[0].description").value("Description for item 1"))
+			.andExpect(jsonPath("$.items[1].id").value(item2Id))
 			.andExpect(jsonPath("$.items[1].name").value("Item 2"))
 			.andExpect(jsonPath("$.items[1].description").value("Description for item 2"))
 			.andExpect(jsonPath("$.amount").value("2"))
@@ -148,8 +157,11 @@ public class ItemControllerIntegrationTest {
 			.perform(
 				post("").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.id").isNotEmpty())
 			.andExpect(jsonPath("$.name").value("Item 3"))
-			.andExpect(jsonPath("$.description").value("Description for item 3"));
+			.andExpect(jsonPath("$.description").value("Description for item 3"))
+			.andExpect(jsonPath("$.createTime").isNotEmpty())
+			.andExpect(jsonPath("$.createdBy").value("user"));
 		
 		assertEquals(3, itemRepository.count());
 	}
@@ -164,8 +176,13 @@ public class ItemControllerIntegrationTest {
 			.perform(
 				put("/" + item2Id).secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(item2Id))
 			.andExpect(jsonPath("$.name").value("Item 2"))
-			.andExpect(jsonPath("$.description").value("New description for item 2"));
+			.andExpect(jsonPath("$.description").value("New description for item 2"))
+			.andExpect(jsonPath("$.createTime").isNotEmpty())
+			.andExpect(jsonPath("$.updateTime").isNotEmpty())
+			.andExpect(jsonPath("$.createdBy").value("user"))
+			.andExpect(jsonPath("$.modifiedBy").value("user"));
 		
 		Optional<Item> item = itemRepository.findByItemId(item2Id);
 		
