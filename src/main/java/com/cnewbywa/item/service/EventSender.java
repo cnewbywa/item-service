@@ -1,6 +1,6 @@
 package com.cnewbywa.item.service;
 
-import com.cnewbywa.item.model.EventMessage;
+import com.cnewbywa.item.model.ItemAction;
 
 public interface EventSender {
 
@@ -8,8 +8,8 @@ public interface EventSender {
 	 * Send events
 	 * 
 	 * @param id
-	 * @param eventMessage
 	 * @param action
+	 * @param eventMessage
 	 */
-	void sendEvent(String id, String eventMessage, EventMessage.EventMessageAction action);
+	void sendEvent(String id, ItemAction action, String eventMessage);
 }

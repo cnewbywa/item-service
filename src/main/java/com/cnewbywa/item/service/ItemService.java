@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
-import com.cnewbywa.item.model.EventMessage;
 import com.cnewbywa.item.model.Item;
+import com.cnewbywa.item.model.ItemAction;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
@@ -57,7 +57,7 @@ public class ItemService {
 		
 		Item item = itemRepository.save(Item.builder().name(itemDto.getName()).description(itemDto.getDescription()).build());
 		
-		eventSender.sendEvent(item.getItemId(), MessageFormat.format(EVENT_MESSAGE__ADD, item.getItemId()), EventMessage.EventMessageAction.ADD);
+		eventSender.sendEvent(item.getItemId(), ItemAction.ADD, MessageFormat.format(EVENT_MESSAGE__ADD, item.getItemId()));
 		
 		return createResponseDto(item);
 	}
@@ -71,7 +71,7 @@ public class ItemService {
 		
 		Item item = itemRepository.save(dbItem);
 		
-		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__MODIFY, id), EventMessage.EventMessageAction.MODIFY);
+		eventSender.sendEvent(id, ItemAction.MODIFY, MessageFormat.format(EVENT_MESSAGE__MODIFY, id));
 		
 		return createResponseDto(item);
 	}
@@ -80,7 +80,7 @@ public class ItemService {
 	public void deleteItem(String id, String user) {
 		itemRepository.deleteByItemId(id);
 		
-		eventSender.sendEvent(id, MessageFormat.format(EVENT_MESSAGE__DELETE, id), EventMessage.EventMessageAction.DELETE);
+		eventSender.sendEvent(id, ItemAction.DELETE, MessageFormat.format(EVENT_MESSAGE__DELETE, id));
 	}
 	
 	private ItemResponseDto createResponseDto(Item item) {

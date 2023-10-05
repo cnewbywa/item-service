@@ -1,7 +1,9 @@
 package com.cnewbywa.item.service;
 
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.kafka.common.Uuid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cnewbywa.item.model.EventMessage;
+import com.cnewbywa.events.EventMessage;
+
+import com.cnewbywa.item.model.ItemAction;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,13 +33,14 @@ public class EventSenderImpl implements EventSender {
 	
     @Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendEvent(String id, String eventMessage, EventMessage.EventMessageAction action) {
-    	sendEvent(EventMessage.builder()
-                .message(String.format(eventMessage, id))
-                .action(action)
-                .id(id)
-                .applicationId(applicationId)
-                .build());
+    public void sendEvent(String itemId, ItemAction action, String eventMessage) {
+    	sendEvent(new EventMessage(
+    			Uuid.randomUuid().toString(),
+    			itemId,
+    			action.toString(),
+    			String.format(eventMessage, itemId),
+    			Instant.now(),
+    			applicationId));
 	}
     
 	private void sendEvent(EventMessage eventMessage) {

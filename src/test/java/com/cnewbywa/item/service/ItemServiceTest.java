@@ -21,8 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
-import com.cnewbywa.item.model.EventMessage;
 import com.cnewbywa.item.model.Item;
+import com.cnewbywa.item.model.ItemAction;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
@@ -112,7 +112,7 @@ class ItemServiceTest {
 		Assertions.assertEquals(itemDto.getDescription(), response.getDescription());
 		
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__ADD, item1Id), EventMessage.EventMessageAction.ADD);
+		Mockito.verify(eventSender).sendEvent(item1Id, ItemAction.ADD, MessageFormat.format(ItemService.EVENT_MESSAGE__ADD, item1Id));
 	}
 	
 	@Test
@@ -136,7 +136,7 @@ class ItemServiceTest {
 		
 		Mockito.verify(itemRepository).findByItemId(item1Id);
 		Mockito.verify(itemRepository).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__MODIFY, item1Id), EventMessage.EventMessageAction.MODIFY);
+		Mockito.verify(eventSender).sendEvent(item1Id, ItemAction.MODIFY, MessageFormat.format(ItemService.EVENT_MESSAGE__MODIFY, item1Id));
 	}
 	
 	@Test
@@ -149,7 +149,7 @@ class ItemServiceTest {
 		
 		Mockito.verify(itemRepository).findByItemId(item1Id);
 		Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyString(), Mockito.anyString(), Mockito.any());
+		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyString(), Mockito.any(), Mockito.anyString());
 	}
 	
 	@Test
@@ -157,6 +157,6 @@ class ItemServiceTest {
 		itemService.deleteItem(item1Id, "user1");
 		
 		Mockito.verify(itemRepository).deleteByItemId(item1Id);
-		Mockito.verify(eventSender).sendEvent(item1Id, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, item1Id), EventMessage.EventMessageAction.DELETE);
+		Mockito.verify(eventSender).sendEvent(item1Id, ItemAction.DELETE, MessageFormat.format(ItemService.EVENT_MESSAGE__DELETE, item1Id));
 	}
 }
