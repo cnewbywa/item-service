@@ -21,6 +21,7 @@
 		<surefire.version>3.1.2</surefire.version>
 		<failsafe.version>3.1.2</failsafe.version>
 		<event-message.version>1.0.0</event-message.version>
+		<jib.version>3.4.0</jib.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -192,6 +193,23 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+        		<groupId>com.google.cloud.tools</groupId>
+        		<artifactId>jib-maven-plugin</artifactId>
+        		<version>${jib.version}</version>
+        		<configuration>
+          			<from>
+            			<image>eclipse-temurin:17-jre</image>
+          			</from>
+          			<container>
+						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+        				<ports>
+            				<port>8443</port>
+        				</ports>
+						<mainClass>com.cnewbywa.item.ItemApplication</mainClass>
+    				</container>
+        		</configuration>
+      		</plugin>
 		</plugins>
 	</build>
 

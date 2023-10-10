@@ -1,0 +1,20 @@
+version: "3.8"
+
+networks:
+    items:
+        external: true
+        name: docker_items-network
+    common:
+        external: true
+        name: external-network
+
+services:
+    # item
+    item:
+        image: item:0.0.1-SNAPSHOT
+        env_file: ~/docker/container_configs/item/.env
+        networks:
+            - items
+            - common
+        ports:
+            - 8443:8443

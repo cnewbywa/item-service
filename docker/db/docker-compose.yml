@@ -17,8 +17,7 @@ services:
     postgres:
         image: postgres:15.4-alpine
         networks:
-            items-network:
-                ipv4_address: 172.41.0.2
+            - items-network
         volumes:
             - ~/docker/container_storage/item/db:/var/lib/postgresql/data
             - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -35,8 +34,6 @@ services:
     redis:
         image: redis:7.2
         networks:
-            items-network:
-                ipv4_address: 172.41.0.3
+            - items-network
         ports:
             - 6379:6379
-        
