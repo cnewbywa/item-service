@@ -22,11 +22,13 @@ import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
 import com.cnewbywa.item.service.ItemService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
+@SecurityRequirement(name = "bearerAuth")
 public class ItemController {
 
 	@Autowired
