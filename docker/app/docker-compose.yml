@@ -3,10 +3,10 @@ version: "3.8"
 networks:
     items:
         external: true
-        name: docker_items-network
+        name: db_items-network
     common:
         external: true
-        name: external-network
+        name: internal-network
 
 services:
     # item
