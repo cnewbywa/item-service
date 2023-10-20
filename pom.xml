@@ -205,8 +205,19 @@
         				<ports>
             				<port>8443</port>
         				</ports>
+        				<jvmFlags>
+							<jvmFlag>-Djavax.net.ssl.trustStore=/cacert/cacerts</jvmFlag>
+						</jvmFlags>
 						<mainClass>com.cnewbywa.item.ItemApplication</mainClass>
     				</container>
+    				<extraDirectories>
+    					<paths>
+							<path>
+								<from>cacert</from>
+								<into>/cacert</into>
+							</path>
+    					</paths>
+    				</extraDirectories>
         		</configuration>
       		</plugin>
 		</plugins>
