@@ -152,6 +152,48 @@ public class ItemControllerIntegrationTest {
 	@Test
 	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
+	void testGetItemsWithPagination() throws Exception {
+		mockMvc
+			.perform(get("/?page=0&size=2").secure(true))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].id").value("694b64b0-e497-4f15-b481-7ef534c6acf7"))
+			.andExpect(jsonPath("$.items[0].name").value("Item 1"))
+			.andExpect(jsonPath("$.items[0].description").value("Description for item 1"))
+			.andExpect(jsonPath("$.items[0].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
+			.andExpect(jsonPath("$.items[1].id").value("b07cea5b-1420-446c-b463-d5167278575f"))
+			.andExpect(jsonPath("$.items[1].name").value("Item 2"))
+			.andExpect(jsonPath("$.items[1].description").value("Description for item 2"))
+			.andExpect(jsonPath("$.items[1].createdBy").value("9b23b873-f992-471d-94b8-ca69de02684d"))
+			.andExpect(jsonPath("$.amount").value("2"))
+			.andExpect(jsonPath("$.totalAmount").value("4"));
+	}
+	
+	@Test
+	@WithMockUser
+	@Sql({"classpath:test_data.sql"})
+	void testGetItemsWithPaginationAndSorting() throws Exception {
+		mockMvc
+			.perform(get("/?page=0&size=3&sort=name,desc").secure(true))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].id").value("20ba68c6-06db-4aad-b86f-859f68d0324b"))
+			.andExpect(jsonPath("$.items[0].name").value("Item 4"))
+			.andExpect(jsonPath("$.items[0].description").value("Description for item 4"))
+			.andExpect(jsonPath("$.items[0].createdBy").value("user"))
+			.andExpect(jsonPath("$.items[1].id").value("d017c380-d1a9-43db-844d-3592d1d54314"))
+			.andExpect(jsonPath("$.items[1].name").value("Item 3"))
+			.andExpect(jsonPath("$.items[1].description").value("Description for item 3"))
+			.andExpect(jsonPath("$.items[1].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
+			.andExpect(jsonPath("$.items[2].id").value("b07cea5b-1420-446c-b463-d5167278575f"))
+			.andExpect(jsonPath("$.items[2].name").value("Item 2"))
+			.andExpect(jsonPath("$.items[2].description").value("Description for item 2"))
+			.andExpect(jsonPath("$.items[2].createdBy").value("9b23b873-f992-471d-94b8-ca69de02684d"))
+			.andExpect(jsonPath("$.amount").value("3"))
+			.andExpect(jsonPath("$.totalAmount").value("4"));
+	}
+	
+	@Test
+	@WithMockUser
+	@Sql({"classpath:test_data.sql"})
 	void testGetItemsByUser() throws Exception {
 		mockMvc
 			.perform(get("/user/38fe0f89-4b11-4e49-b4e6-82ec437f201f").secure(true))
