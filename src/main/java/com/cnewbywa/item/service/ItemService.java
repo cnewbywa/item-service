@@ -52,6 +52,15 @@ public class ItemService {
 		return ItemListResponseDto.builder().amount(page.getNumberOfElements()).totalAmount(page.getTotalElements()).items(responses).build();
 	}
 	
+	@Cacheable("items")
+	public ItemListResponseDto getItemsByUser(String user, Pageable pageable) {
+		Page<Item> page = itemRepository.findAllByCreatedBy(user, pageable);
+		
+		List<ItemResponseDto> responses = page.getContent().stream().map(this::createResponseDto).toList();
+		
+		return ItemListResponseDto.builder().amount(page.getNumberOfElements()).totalAmount(page.getTotalElements()).items(responses).build();
+	}
+	
 	public ItemResponseDto addItem(ItemDto itemDto, String user) {
 		log.debug("User: " + user);
 		

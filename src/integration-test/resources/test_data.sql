@@ -1,0 +1,4 @@
+INSERT INTO item.item (item_id, name, description, create_time, created_by, version) VALUES ('694b64b0-e497-4f15-b481-7ef534c6acf7', 'Item 1', 'Description for item 1', now(), '38fe0f89-4b11-4e49-b4e6-82ec437f201f', 0);
+INSERT INTO item.item (item_id, name, description, create_time, created_by, version) VALUES ('b07cea5b-1420-446c-b463-d5167278575f', 'Item 2', 'Description for item 2', now(), '9b23b873-f992-471d-94b8-ca69de02684d', 0);
+INSERT INTO item.item (item_id, name, description, create_time, created_by, version) VALUES ('d017c380-d1a9-43db-844d-3592d1d54314', 'Item 3', 'Description for item 3', now(), '38fe0f89-4b11-4e49-b4e6-82ec437f201f', 0);
+INSERT INTO item.item (item_id, name, description, create_time, created_by, version) VALUES ('20ba68c6-06db-4aad-b86f-859f68d0324b', 'Item 4', 'Description for item 4', now(), 'user', 0);

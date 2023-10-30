@@ -96,6 +96,33 @@ class ItemServiceTest {
 	}
 	
 	@Test
+	void testGetItemsByUser_Success() {
+		Item dbItem = Item.builder().itemId(item1Id).build();
+		Item dbItem2 = Item.builder().itemId(item2Id).build();
+		
+		Mockito.when(itemRepository.findAllByCreatedBy(Mockito.eq("user1"), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>(Arrays.asList(dbItem, dbItem2))));
+		
+		ItemListResponseDto response = itemService.getItemsByUser("user1", PageRequest.of(0, 5, Sort.Direction.ASC, "id"));
+		
+		Assertions.assertNotNull(response);
+		Assertions.assertEquals(2, response.getAmount());
+		
+		Mockito.verify(itemRepository).findAllByCreatedBy(Mockito.eq("user1"), Mockito.any(Pageable.class));
+	}
+	
+	@Test
+	void testGetItemsByUser_Success_NoResult() {
+		Mockito.when(itemRepository.findAllByCreatedBy(Mockito.eq("user2"), Mockito.any(Pageable.class))).thenReturn(new PageImpl<>(new ArrayList<>()));
+		
+		ItemListResponseDto response = itemService.getItemsByUser("user2", PageRequest.of(0, 5, Sort.Direction.ASC, "id"));
+		
+		Assertions.assertNotNull(response);
+		Assertions.assertEquals(0, response.getAmount());
+		
+		Mockito.verify(itemRepository).findAllByCreatedBy(Mockito.eq("user2"), Mockito.any(Pageable.class));
+	}
+	
+	@Test
 	void testAddItem_Success() {
 		String name = "Item 1";
 		String description = "Description of item 1";

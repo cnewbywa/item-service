@@ -1,5 +1,6 @@
 package com.cnewbywa.item.controller;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -10,11 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +31,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +67,7 @@ public class ItemControllerIntegrationTest {
 	private int port;
 
 	@Container
-	private static GenericContainer postgresqlContainer = new GenericContainer(DockerImageName.parse("postgres:15.4-alpine"))
+	private static GenericContainer postgresqlContainer = new GenericContainer<>(DockerImageName.parse("postgres:15.4-alpine"))
 		.withEnv("POSTGRES_DB", "postgres")
         .withEnv("POSTGRES_USER", "postgres")
         .withEnv("POSTGRES_PASSWORD", "postgres")
@@ -87,14 +87,10 @@ public class ItemControllerIntegrationTest {
 		registry.add("spring.data.redis.port", () -> redisContainer.getFirstMappedPort());
 	}
 	
-	private String item1Id = UUID.randomUUID().toString();
-	private String item2Id = UUID.randomUUID().toString();
-	
 	@BeforeEach
 	@Transactional
 	void setup() {
-		itemRepository.save(Item.builder().itemId(item1Id).name("Item 1").description("Description for item 1").build());
-	    itemRepository.save(Item.builder().itemId(item2Id).name("Item 2").description("Description for item 2").build());
+
 	}
 	
 	@AfterEach
@@ -105,21 +101,21 @@ public class ItemControllerIntegrationTest {
 	
 	@Test
 	@WithMockUser
-	@Order(1)
+	@Sql({"classpath:test_data.sql"})
 	void testGetItem() throws Exception {
 		mockMvc
-			.perform(get("/" + item1Id).secure(true))
+			.perform(get("/694b64b0-e497-4f15-b481-7ef534c6acf7").secure(true))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(item1Id))
+			.andExpect(jsonPath("$.id").value("694b64b0-e497-4f15-b481-7ef534c6acf7"))
 			.andExpect(jsonPath("$.name").value("Item 1"))
 			.andExpect(jsonPath("$.description").value("Description for item 1"))
 			.andExpect(jsonPath("$.createTime").isNotEmpty())
-			.andExpect(jsonPath("$.createdBy").value("user"));
+			.andExpect(jsonPath("$.createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"));
 	}
 	
 	@Test
 	@WithMockUser
-	@Order(2)
+	@Sql({"classpath:test_data.sql"})
 	void testGetItem_InvalidId() throws Exception {
 		mockMvc
 			.perform(get("/1").secure(true))
@@ -128,24 +124,68 @@ public class ItemControllerIntegrationTest {
 	
 	@Test
 	@WithMockUser
-	@Order(3)
+	@Sql({"classpath:test_data.sql"})
 	void testGetItems() throws Exception {
 		mockMvc
 			.perform(get("").secure(true))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.items[0].id").value(item1Id))
+			.andExpect(jsonPath("$.items[0].id").value("694b64b0-e497-4f15-b481-7ef534c6acf7"))
 			.andExpect(jsonPath("$.items[0].name").value("Item 1"))
 			.andExpect(jsonPath("$.items[0].description").value("Description for item 1"))
-			.andExpect(jsonPath("$.items[1].id").value(item2Id))
+			.andExpect(jsonPath("$.items[0].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
+			.andExpect(jsonPath("$.items[1].id").value("b07cea5b-1420-446c-b463-d5167278575f"))
 			.andExpect(jsonPath("$.items[1].name").value("Item 2"))
 			.andExpect(jsonPath("$.items[1].description").value("Description for item 2"))
+			.andExpect(jsonPath("$.items[1].createdBy").value("9b23b873-f992-471d-94b8-ca69de02684d"))
+			.andExpect(jsonPath("$.items[2].id").value("d017c380-d1a9-43db-844d-3592d1d54314"))
+			.andExpect(jsonPath("$.items[2].name").value("Item 3"))
+			.andExpect(jsonPath("$.items[2].description").value("Description for item 3"))
+			.andExpect(jsonPath("$.items[2].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
+			.andExpect(jsonPath("$.items[3].id").value("20ba68c6-06db-4aad-b86f-859f68d0324b"))
+			.andExpect(jsonPath("$.items[3].name").value("Item 4"))
+			.andExpect(jsonPath("$.items[3].description").value("Description for item 4"))
+			.andExpect(jsonPath("$.items[3].createdBy").value("user"))
+			.andExpect(jsonPath("$.amount").value("4"))
+			.andExpect(jsonPath("$.totalAmount").value("4"));
+	}
+	
+	@Test
+	@WithMockUser
+	@Sql({"classpath:test_data.sql"})
+	void testGetItemsByUser() throws Exception {
+		mockMvc
+			.perform(get("/user/38fe0f89-4b11-4e49-b4e6-82ec437f201f").secure(true))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].id").value("694b64b0-e497-4f15-b481-7ef534c6acf7"))
+			.andExpect(jsonPath("$.items[0].name").value("Item 1"))
+			.andExpect(jsonPath("$.items[0].description").value("Description for item 1"))
+			.andExpect(jsonPath("$.items[0].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
+			.andExpect(jsonPath("$.items[1].id").value("d017c380-d1a9-43db-844d-3592d1d54314"))
+			.andExpect(jsonPath("$.items[1].name").value("Item 3"))
+			.andExpect(jsonPath("$.items[1].description").value("Description for item 3"))
+			.andExpect(jsonPath("$.items[1].createdBy").value("38fe0f89-4b11-4e49-b4e6-82ec437f201f"))
 			.andExpect(jsonPath("$.amount").value("2"))
 			.andExpect(jsonPath("$.totalAmount").value("2"));
 	}
 	
 	@Test
 	@WithMockUser
-	@Order(4)
+	@Sql({"classpath:test_data.sql"})
+	void testGetItemsByLoggedInUser() throws Exception {
+		mockMvc
+			.perform(get("/user").secure(true))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.items[0].id").value("20ba68c6-06db-4aad-b86f-859f68d0324b"))
+			.andExpect(jsonPath("$.items[0].name").value("Item 4"))
+			.andExpect(jsonPath("$.items[0].description").value("Description for item 4"))
+			.andExpect(jsonPath("$.items[0].createdBy").value("user"))
+			.andExpect(jsonPath("$.amount").value("1"))
+			.andExpect(jsonPath("$.totalAmount").value("1"));
+	}
+	
+	@Test
+	@WithMockUser
+	@Sql({"classpath:test_data.sql"})
 	void testAddItem() throws Exception {
 		String content = "{ \"name\": \"Item 3\", \"description\": \"Description for item 3\"}";
 		
@@ -159,36 +199,33 @@ public class ItemControllerIntegrationTest {
 			.andExpect(jsonPath("$.createTime").isNotEmpty())
 			.andExpect(jsonPath("$.createdBy").value("user"));
 		
-		assertEquals(3, itemRepository.count());
+		assertEquals(5, itemRepository.count());
 	}
 	
 	@Test
 	@WithMockUser
-	@Order(5)
+	@Sql({"classpath:test_data.sql"})
 	void testUpdateItem() throws Exception {
 		String content = "{ \"name\": \"Item 2\", \"description\": \"New description for item 2\"}";
 		
 		mockMvc
 			.perform(
-				put("/" + item2Id).secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
+				put("/b07cea5b-1420-446c-b463-d5167278575f").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(item2Id))
-			.andExpect(jsonPath("$.name").value("Item 2"))
-			.andExpect(jsonPath("$.description").value("New description for item 2"))
-			.andExpect(jsonPath("$.createTime").isNotEmpty())
-			.andExpect(jsonPath("$.updateTime").isNotEmpty())
-			.andExpect(jsonPath("$.createdBy").value("user"))
-			.andExpect(jsonPath("$.modifiedBy").value("user"));
+			.andExpect(jsonPath("$.id").value("b07cea5b-1420-446c-b463-d5167278575f"))
+			.andExpect(jsonPath("$.description").value("New description for item 2"));
 		
-		Optional<Item> item = itemRepository.findByItemId(item2Id);
+		Optional<Item> item = itemRepository.findByItemId("b07cea5b-1420-446c-b463-d5167278575f");
 		
 		assertTrue(item.isPresent());
 		assertEquals("New description for item 2", item.get().getDescription());
+		assertNotNull(item.get().getUpdateTime());
+		assertEquals("user", item.get().getModifiedBy());
 	}
 	
 	@Test
 	@WithMockUser
-	@Order(6)
+	@Sql({"classpath:test_data.sql"})
 	void testUpdateItem_InvalidId() throws Exception {
 		String content = "{ \"name\": \"Item 3\", \"description\": \"New description for item 3\"}";
 		
@@ -200,23 +237,23 @@ public class ItemControllerIntegrationTest {
 	
 	@Test
 	@WithMockUser
-	@Order(7)
+	@Sql({"classpath:test_data.sql"})
 	void testDeleteItem() throws Exception {
 		mockMvc
 			.perform(
-				delete("/" + item2Id).secure(true).with(SecurityMockMvcRequestPostProcessors.jwt()))
+				delete("/b07cea5b-1420-446c-b463-d5167278575f").secure(true).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isOk())
 			.andDo(print());
 		
-		assertTrue(itemRepository.findByItemId(item2Id).isEmpty());
+		assertTrue(itemRepository.findByItemId("b07cea5b-1420-446c-b463-d5167278575f").isEmpty());
 	}
 	
 	@Test
 	@WithMockUser
-	@Order(8)
+	@Sql({"classpath:test_data.sql"})
 	void testGetItem_WithHttp() throws Exception {
 		mockMvc
-			.perform(get("/" + item1Id))
+			.perform(get("/694b64b0-e497-4f15-b481-7ef534c6acf7"))
 			.andExpect(status().is3xxRedirection());
 	}
 }

@@ -46,6 +46,18 @@ public class ItemController {
 		return ResponseEntity.ok(itemService.getItems(pageable));
 	}
 	
+	@GetMapping(path = "/user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<ItemListResponseDto> getItemsByUser(@PathVariable String userId, Pageable pageable) {
+		return ResponseEntity.ok(itemService.getItemsByUser(userId, pageable));
+	}
+	
+	@GetMapping(path = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<ItemListResponseDto> getItemsByLoggedInUser(Authentication authentication, Pageable pageable) {
+		return ResponseEntity.ok(itemService.getItemsByUser(getLoggedInUser(authentication), pageable));
+	}
+	
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<ItemResponseDto> addItem(Authentication authentication, @RequestBody @Nonnull ItemDto item) {

@@ -114,6 +114,94 @@ class ItemControllerTest {
 	}
 	
 	@Test
+	void testGetItemsByUser_Success() {
+		Pageable pageable = PageRequest.of(0, 2);
+		
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").createdBy("test-user-id").build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").createdBy("test-user-id").build();
+		
+		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
+		
+		Mockito.when(itemService.getItemsByUser("test-user-id", pageable)).thenReturn(listResponse);
+		
+		ResponseEntity<ItemListResponseDto> responseEntity = itemController.getItemsByUser("test-user-id", pageable);
+		
+		Assertions.assertNotNull(responseEntity);
+		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		Assertions.assertNotNull(responseEntity.getBody());
+		Assertions.assertEquals(2L, responseEntity.getBody().getAmount());
+		Assertions.assertEquals(2L, responseEntity.getBody().getTotalAmount());
+		assertResponseDto(response, responseEntity.getBody().getItems().get(0));
+		assertResponseDto(response2, responseEntity.getBody().getItems().get(1));
+		
+		Mockito.verify(itemService).getItemsByUser("test-user-id", pageable);
+	}
+	
+	@Test
+	void testGetItemsByUser_Success_NoResult() {
+		Pageable pageable = PageRequest.of(0, 2);
+		
+		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(new ArrayList<>()).amount(0).totalAmount(0).build();
+		
+		Mockito.when(itemService.getItemsByUser("test-user-id", pageable)).thenReturn(listResponse);
+		
+		ResponseEntity<ItemListResponseDto> responseEntity = itemController.getItemsByUser("test-user-id", pageable);
+		
+		Assertions.assertNotNull(responseEntity);
+		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		Assertions.assertNotNull(responseEntity.getBody());
+		Assertions.assertEquals(0L, responseEntity.getBody().getAmount());
+		Assertions.assertEquals(0L, responseEntity.getBody().getTotalAmount());
+		Assertions.assertTrue(responseEntity.getBody().getItems().isEmpty());
+		
+		Mockito.verify(itemService).getItemsByUser("test-user-id", pageable);
+	}
+	
+	@Test
+	void testGetItemsByLoggedInUser_Success() {
+		Pageable pageable = PageRequest.of(0, 2);
+		
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").createdBy("test-user-id").build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").createdBy("test-user-id").build();
+		
+		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
+		
+		Mockito.when(itemService.getItemsByUser("test-user-id", pageable)).thenReturn(listResponse);
+		
+		ResponseEntity<ItemListResponseDto> responseEntity = itemController.getItemsByLoggedInUser(createAuthentication("test-user-id"), pageable);
+		
+		Assertions.assertNotNull(responseEntity);
+		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		Assertions.assertNotNull(responseEntity.getBody());
+		Assertions.assertEquals(2L, responseEntity.getBody().getAmount());
+		Assertions.assertEquals(2L, responseEntity.getBody().getTotalAmount());
+		assertResponseDto(response, responseEntity.getBody().getItems().get(0));
+		assertResponseDto(response2, responseEntity.getBody().getItems().get(1));
+		
+		Mockito.verify(itemService).getItemsByUser("test-user-id", pageable);
+	}
+	
+	@Test
+	void testGetItemsByLoggedInUser_Success_NoResult() {
+		Pageable pageable = PageRequest.of(0, 2);
+		
+		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(new ArrayList<>()).amount(0).totalAmount(0).build();
+		
+		Mockito.when(itemService.getItemsByUser("test-user-id", pageable)).thenReturn(listResponse);
+		
+		ResponseEntity<ItemListResponseDto> responseEntity = itemController.getItemsByLoggedInUser(createAuthentication("test-user-id"), pageable);
+		
+		Assertions.assertNotNull(responseEntity);
+		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		Assertions.assertNotNull(responseEntity.getBody());
+		Assertions.assertEquals(0L, responseEntity.getBody().getAmount());
+		Assertions.assertEquals(0L, responseEntity.getBody().getTotalAmount());
+		Assertions.assertTrue(responseEntity.getBody().getItems().isEmpty());
+		
+		Mockito.verify(itemService).getItemsByUser("test-user-id", pageable);
+	}
+	
+	@Test
 	void testAddItem() {
 		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 2").description("Description for item 2").build();
 		
