@@ -14,7 +14,7 @@
 	<name>item-service</name>
 	<description>Item project</description>
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<springdoc.version>2.2.0</springdoc.version>
 		<build-helper.version>3.4.0</build-helper.version>
 		<surefire.version>3.1.2</surefire.version>
@@ -202,7 +202,7 @@
         		<version>${jib.version}</version>
         		<configuration>
           			<from>
-            			<image>eclipse-temurin:17-jre</image>
+            			<image>eclipse-temurin:21-jre</image>
           			</from>
           			<container>
 						<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
