@@ -54,12 +54,23 @@ Very simplified flow:
 ### Start
 
 #### Local
+Prerequisites:
+
+ * ca.crt from the [auth service proxy ssl directory](https://github.com/cnewbywa/common-services/tree/main/docker/runtime/auth/nginx/ssl) has been added to the Java truststore, with the following command:
+
+```
+keytool -import -trustcacerts -keystore <location of the cacerts file in the currently used sdk> \
+   -storepass changeit -noprompt -alias authcacert -file ca.crt
+```
+
+Start the application:
+
 ```
 ./mvnw spring-boot:run -Dspring-boot.run.arguments="--postgres.password=bD4xo9RcW- --item.keystore.password=itemservice" -Dspring-boot.run.profiles=local
 ```
 
 #### Docker
-Run the `docker/app/start.sh` script
+Run the `docker/app/start.sh` script to start the application
 
 ### Use
 Swagger UI is available at `https://localhost:8443/items/swagger-ui/index.html`. You need to fetch an access token to be able to call the services (see below one way to do it).
