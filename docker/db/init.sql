@@ -1,4 +1,4 @@
-CREATE SCHEMA item;
+CREATE SCHEMA IF NOT EXISTS item;
 
 CREATE TABLE IF NOT EXISTS item.item (
     id serial PRIMARY KEY,
@@ -10,3 +10,7 @@ CREATE TABLE IF NOT EXISTS item.item (
     created_by VARCHAR(75),
     modified_by VARCHAR(75),
     version serial);
+
+CREATE INDEX idx_item_item_id ON item.item(item_id);
+
+CREATE INDEX idx_item_created_by ON item.item(created_by);
