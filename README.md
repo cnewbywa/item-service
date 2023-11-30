@@ -1,7 +1,7 @@
 # Item service
 
 ## Overview
-This is a simple rest service built with [Spring Boot](https://spring.io/projects/spring-boot) that lets users add, modify, delete and retrieve generic item objects. The service contains the following additional features:
+This is a simple rest service built with [Spring Boot](https://spring.io/projects/spring-boot) that lets users add, modify, delete and retrieve generic item objects. The service uses [virtual threads](https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html) and it contains the following additional features:
 
  * [OAuth2](https://oauth.net/2/) authentication
  * Redis cache
@@ -21,6 +21,7 @@ Postgres and Redis [Docker Compose](https://docs.docker.com/compose/) configurat
 Prerequisites:
 
  * [event-message](https://github.com/cnewbywa/event-message) project built and installed to local Maven repository
+ * Java 21+
 
 This project supports running the application either locally or in a docker container. The docker image creation is done with [Jib](https://github.com/GoogleContainerTools/jib).
 
@@ -43,6 +44,7 @@ Prerequisites:
 
  * Keycloak running
  * Kafka running
+ * Java 21+
 
 Start Postgres and Redis by running the `docker/db/start.sh` script. Please note that the Docker Compose project mounts volumes to the host file system and uses [Docker secrets](https://docs.docker.com/compose/use-secrets/).
 
