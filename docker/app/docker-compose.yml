@@ -11,7 +11,7 @@ networks:
 services:
     # item
     item:
-        image: item:0.0.1-SNAPSHOT
+        image: item-service:0.0.1-SNAPSHOT
         env_file: ~/docker/container_configs/item/.env
         networks:
             - items
