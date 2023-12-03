@@ -20,6 +20,7 @@ Postgres and Redis [Docker Compose](https://docs.docker.com/compose/) configurat
 ## Build
 Prerequisites:
 
+ * [cnewbywa-spring-parent](https://github.com/cnewbywa/cnewbywa-spring-parent) project built and installed to local Maven repository
  * [event-message](https://github.com/cnewbywa/event-message) project built and installed to local Maven repository
  * Java 21+
 
