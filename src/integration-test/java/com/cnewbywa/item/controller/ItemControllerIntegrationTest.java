@@ -47,7 +47,7 @@ import com.cnewbywa.item.repository.ItemRepository;
 @Import(SecurityConfig.class)
 @TestPropertySource("classpath:application-it-test.properties")
 @DirtiesContext
-@EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9093", "port=9093" }, topics = { "events" })
+@EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9093", "port=9093" }, topics = { "events" }, kraft = false)
 @Testcontainers
 public class ItemControllerIntegrationTest {
 
