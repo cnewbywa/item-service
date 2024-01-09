@@ -120,7 +120,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItems() throws Exception {
 		mockMvc
@@ -147,7 +146,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsWithPagination() throws Exception {
 		mockMvc
@@ -166,7 +164,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsWithPaginationAndSorting() throws Exception {
 		mockMvc
@@ -189,7 +186,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsByUser() throws Exception {
 		mockMvc

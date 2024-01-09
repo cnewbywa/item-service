@@ -2,6 +2,7 @@ package com.cnewbywa.item.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,7 +16,10 @@ public class SecurityConfig {
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.requiresChannel(channel -> channel.anyRequest().requiresSecure())
-			.authorizeHttpRequests(authorize -> authorize.requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/webjars/swagger-ui/**").permitAll().anyRequest().authenticated())
+			.authorizeHttpRequests(authorize -> authorize
+					.requestMatchers(HttpMethod.GET, "/", "/user/**").permitAll()
+					.requestMatchers("/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/webjars/swagger-ui/**").permitAll()
+					.anyRequest().authenticated())
 			.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(Customizer.withDefaults()));
 		
 		return http.build();
