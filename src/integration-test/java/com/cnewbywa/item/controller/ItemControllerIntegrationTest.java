@@ -47,7 +47,7 @@ import com.cnewbywa.item.repository.ItemRepository;
 @Import(SecurityConfig.class)
 @TestPropertySource("classpath:application-it-test.properties")
 @DirtiesContext
-@EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9093", "port=9093" }, topics = { "events" })
+@EmbeddedKafka(partitions = 1, brokerProperties = { "listeners=PLAINTEXT://localhost:9093", "port=9093" }, topics = { "events" }, kraft = false)
 @Testcontainers
 public class ItemControllerIntegrationTest {
 
@@ -71,7 +71,7 @@ public class ItemControllerIntegrationTest {
         .withExposedPorts(5432);
 	
 	@Container
-	public static GenericContainer redisContainer = new GenericContainer(DockerImageName.parse("redis:7.2.0"))
+	public static GenericContainer redisContainer = new GenericContainer(DockerImageName.parse("redis:7.2"))
 	    .withExposedPorts(6379);
 	
 	@DynamicPropertySource
@@ -120,7 +120,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItems() throws Exception {
 		mockMvc
@@ -147,7 +146,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsWithPagination() throws Exception {
 		mockMvc
@@ -166,7 +164,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsWithPaginationAndSorting() throws Exception {
 		mockMvc
@@ -189,7 +186,6 @@ public class ItemControllerIntegrationTest {
 	}
 	
 	@Test
-	@WithMockUser
 	@Sql({"classpath:test_data.sql"})
 	void testGetItemsByUser() throws Exception {
 		mockMvc

@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
-@SecurityRequirement(name = "bearerAuth")
 public class ItemController {
 
 	@Autowired
@@ -36,6 +35,7 @@ public class ItemController {
 	
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable String id) {
 		return ResponseEntity.ok(itemService.getItem(id));
 	}
@@ -54,24 +54,28 @@ public class ItemController {
 	
 	@GetMapping(path = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemListResponseDto> getItemsByLoggedInUser(Authentication authentication, Pageable pageable) {
 		return ResponseEntity.ok(itemService.getItemsByUser(getLoggedInUser(authentication), pageable));
 	}
 	
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemResponseDto> addItem(Authentication authentication, @RequestBody @Nonnull ItemDto item) {
 		return new ResponseEntity<>(itemService.addItem(item, getLoggedInUser(authentication)), HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
+	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable String id, @RequestBody @Nonnull ItemDto item) {
 		return ResponseEntity.ok(itemService.updateItem(id, item, getLoggedInUser(authentication)));
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
+	@SecurityRequirement(name = "bearerAuth")
 	public void deleteItem(Authentication authentication, @PathVariable String id) {
 		itemService.deleteItem(id, getLoggedInUser(authentication));
 	}
