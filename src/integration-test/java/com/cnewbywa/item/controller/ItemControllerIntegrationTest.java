@@ -71,7 +71,7 @@ public class ItemControllerIntegrationTest {
         .withExposedPorts(5432);
 	
 	@Container
-	public static GenericContainer redisContainer = new GenericContainer(DockerImageName.parse("redis:7.2.0"))
+	public static GenericContainer redisContainer = new GenericContainer(DockerImageName.parse("redis:7.2"))
 	    .withExposedPorts(6379);
 	
 	@DynamicPropertySource
