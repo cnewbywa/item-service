@@ -1,6 +1,7 @@
 package com.cnewbywa.item.repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +11,9 @@ import com.cnewbywa.item.model.Item;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 	
-	Optional<Item> findByItemId(String itemId);
+	Optional<Item> findByItemId(UUID itemId);
 	
 	Page<Item> findAllByCreatedBy(String user, Pageable pageable);
 	
-	void deleteByItemId(String itemId);
+	void deleteByItemId(UUID itemId);
 }

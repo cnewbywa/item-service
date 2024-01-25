@@ -1,6 +1,7 @@
 package com.cnewbywa.item.service;
 
 import java.time.Instant;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import org.apache.kafka.common.Uuid;
@@ -33,10 +34,10 @@ public class EventSenderImpl implements EventSender {
 	
     @Override
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void sendEvent(String itemId, ItemAction action, String eventMessage) {
+    public void sendEvent(UUID itemId, ItemAction action, String eventMessage) {
     	sendEvent(new EventMessage(
     			Uuid.randomUuid().toString(),
-    			itemId,
+    			itemId.toString(),
     			action.toString(),
     			String.format(eventMessage, itemId),
     			Instant.now(),
