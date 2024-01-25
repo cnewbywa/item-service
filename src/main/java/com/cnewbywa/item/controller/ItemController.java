@@ -76,7 +76,7 @@ public class ItemController {
 	}
 	
 	@DeleteMapping(path = "/{id}")
-	@ResponseStatus(HttpStatus.OK)
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@SecurityRequirement(name = "bearerAuth")
 	public void deleteItem(Authentication authentication, @PathVariable UUID id) {
 		itemService.deleteItem(id, getLoggedInUser(authentication));

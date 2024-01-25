@@ -278,7 +278,7 @@ public class ItemControllerIntegrationTest {
 		mockMvc
 			.perform(
 				delete("/b07cea5b-1420-446c-b463-d5167278575f").secure(true).with(SecurityMockMvcRequestPostProcessors.jwt()))
-			.andExpect(status().isOk())
+			.andExpect(status().isNoContent())
 			.andDo(print());
 		
 		assertTrue(itemRepository.findByItemId(UUID.fromString("b07cea5b-1420-446c-b463-d5167278575f")).isEmpty());
