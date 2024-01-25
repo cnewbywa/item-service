@@ -1,5 +1,7 @@
 package com.cnewbywa.item.controller;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,7 +38,7 @@ public class ItemController {
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
-	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable String id) {
+	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable UUID id) {
 		return ResponseEntity.ok(itemService.getItem(id));
 	}
 	
@@ -69,14 +71,14 @@ public class ItemController {
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
-	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable String id, @RequestBody @Nonnull ItemDto item) {
+	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable UUID id, @RequestBody @Nonnull ItemDto item) {
 		return ResponseEntity.ok(itemService.updateItem(id, item, getLoggedInUser(authentication)));
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
-	public void deleteItem(Authentication authentication, @PathVariable String id) {
+	public void deleteItem(Authentication authentication, @PathVariable UUID id) {
 		itemService.deleteItem(id, getLoggedInUser(authentication));
 	}
 	

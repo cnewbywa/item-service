@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -115,7 +116,7 @@ public class ItemControllerIntegrationTest {
 	@Sql({"classpath:test_data.sql"})
 	void testGetItem_InvalidId() throws Exception {
 		mockMvc
-			.perform(get("/1").secure(true))
+			.perform(get("/27d4eb41-eaf3-4b01-b1ef-40725a15e5f1").secure(true))
 			.andExpect(status().isNotFound());
 	}
 	
@@ -250,7 +251,7 @@ public class ItemControllerIntegrationTest {
 			.andExpect(jsonPath("$.id").value("b07cea5b-1420-446c-b463-d5167278575f"))
 			.andExpect(jsonPath("$.description").value("New description for item 2"));
 		
-		Optional<Item> item = itemRepository.findByItemId("b07cea5b-1420-446c-b463-d5167278575f");
+		Optional<Item> item = itemRepository.findByItemId(UUID.fromString("b07cea5b-1420-446c-b463-d5167278575f"));
 		
 		assertTrue(item.isPresent());
 		assertEquals("New description for item 2", item.get().getDescription());
@@ -266,7 +267,7 @@ public class ItemControllerIntegrationTest {
 		
 		mockMvc
 			.perform(
-				put("/3").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
+				put("/2ac981b2-b44b-42a8-81b5-8edd084b3bb2").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isNotFound());
 	}
 	
@@ -280,7 +281,7 @@ public class ItemControllerIntegrationTest {
 			.andExpect(status().isOk())
 			.andDo(print());
 		
-		assertTrue(itemRepository.findByItemId("b07cea5b-1420-446c-b463-d5167278575f").isEmpty());
+		assertTrue(itemRepository.findByItemId(UUID.fromString("b07cea5b-1420-446c-b463-d5167278575f")).isEmpty());
 	}
 	
 	@Test

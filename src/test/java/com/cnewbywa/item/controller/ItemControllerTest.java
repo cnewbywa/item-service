@@ -38,8 +38,8 @@ class ItemControllerTest {
 	@InjectMocks
 	private ItemController itemController;
 	
-	private String item1Id = UUID.randomUUID().toString();
-	private String item2Id = UUID.randomUUID().toString();
+	private UUID item1Id = UUID.randomUUID();
+	private UUID item2Id = UUID.randomUUID();
 	
 	@Test
 	void testGetItem_Success() {
@@ -261,7 +261,7 @@ class ItemControllerTest {
 			itemController.updateItem(null, item1Id, null);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyString(), Mockito.any(ItemDto.class), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.any(UUID.class), Mockito.any(ItemDto.class), Mockito.anyString());
 	}
 	
 	@Test
@@ -270,7 +270,7 @@ class ItemControllerTest {
 			itemController.updateItem(createAuthentication(null), item1Id, null);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.anyString(), Mockito.any(ItemDto.class), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).updateItem(Mockito.any(UUID.class), Mockito.any(ItemDto.class), Mockito.anyString());
 	}
 	
 	@Test
@@ -288,7 +288,7 @@ class ItemControllerTest {
 			itemController.deleteItem(null, item1Id);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyString(), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.any(UUID.class), Mockito.anyString());
 	}
 	
 	@Test
@@ -297,7 +297,7 @@ class ItemControllerTest {
 			itemController.deleteItem(createAuthentication(null), item1Id);
 	    });
 		
-		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.anyString(), Mockito.anyString());
+		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.any(UUID.class), Mockito.anyString());
 	}
 	
 	private void assertResponseDto(ItemResponseDto expectedResponse, ItemResponseDto actualResponse) {

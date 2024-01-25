@@ -40,8 +40,8 @@ class ItemServiceTest {
 	@Mock
 	private EventSender eventSender;
 	
-	private String item1Id = UUID.randomUUID().toString();
-	private String item2Id = UUID.randomUUID().toString();
+	private UUID item1Id = UUID.randomUUID();
+	private UUID item2Id = UUID.randomUUID();
 	
 	@Test
 	void testGetItem_Success() {
@@ -176,7 +176,7 @@ class ItemServiceTest {
 		
 		Mockito.verify(itemRepository).findByItemId(item1Id);
 		Mockito.verify(itemRepository, Mockito.never()).save(Mockito.any(Item.class));
-		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.anyString(), Mockito.any(), Mockito.anyString());
+		Mockito.verify(eventSender, Mockito.never()).sendEvent(Mockito.any(UUID.class), Mockito.any(), Mockito.anyString());
 	}
 	
 	@Test

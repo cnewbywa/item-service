@@ -2,6 +2,7 @@ package com.cnewbywa.item.service;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -37,7 +38,7 @@ public class ItemService {
     private EventSender eventSender;
 	
 	@Cacheable("item")
-	public ItemResponseDto getItem(String id) {
+	public ItemResponseDto getItem(UUID id) {
 		Item item = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		return createResponseDto(item);
@@ -72,7 +73,7 @@ public class ItemService {
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public ItemResponseDto updateItem(String id, ItemDto itemDto, String user) {
+	public ItemResponseDto updateItem(UUID id, ItemDto itemDto, String user) {
 		Item dbItem = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		dbItem.setName(itemDto.getName());
@@ -86,7 +87,7 @@ public class ItemService {
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public void deleteItem(String id, String user) {
+	public void deleteItem(UUID id, String user) {
 		itemRepository.deleteByItemId(id);
 		
 		eventSender.sendEvent(id, ItemAction.DELETE, MessageFormat.format(EVENT_MESSAGE__DELETE, id));

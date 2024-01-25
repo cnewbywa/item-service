@@ -1,5 +1,7 @@
 package com.cnewbywa.item.service;
 
+import java.util.UUID;
+
 import com.cnewbywa.item.model.ItemAction;
 
 public interface EventSender {
@@ -11,5 +13,5 @@ public interface EventSender {
 	 * @param action
 	 * @param eventMessage
 	 */
-	void sendEvent(String id, ItemAction action, String eventMessage);
+	void sendEvent(UUID id, ItemAction action, String eventMessage);
 }
