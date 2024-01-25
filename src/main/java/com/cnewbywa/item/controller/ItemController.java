@@ -19,9 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.cnewbywa.item.model.ItemDetailedResponseDto;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
-import com.cnewbywa.item.model.ItemResponseDto;
 import com.cnewbywa.item.service.ItemService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -38,7 +38,7 @@ public class ItemController {
 	@GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
-	public ResponseEntity<ItemResponseDto> getIrem(@PathVariable UUID id) {
+	public ResponseEntity<ItemDetailedResponseDto> getIrem(@PathVariable UUID id) {
 		return ResponseEntity.ok(itemService.getItem(id));
 	}
 	
@@ -64,14 +64,14 @@ public class ItemController {
 	@PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	@SecurityRequirement(name = "bearerAuth")
-	public ResponseEntity<ItemResponseDto> addItem(Authentication authentication, @RequestBody @Nonnull ItemDto item) {
+	public ResponseEntity<ItemDetailedResponseDto> addItem(Authentication authentication, @RequestBody @Nonnull ItemDto item) {
 		return new ResponseEntity<>(itemService.addItem(item, getLoggedInUser(authentication)), HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
-	public ResponseEntity<ItemResponseDto> updateItem(Authentication authentication, @PathVariable UUID id, @RequestBody @Nonnull ItemDto item) {
+	public ResponseEntity<ItemDetailedResponseDto> updateItem(Authentication authentication, @PathVariable UUID id, @RequestBody @Nonnull ItemDto item) {
 		return ResponseEntity.ok(itemService.updateItem(id, item, getLoggedInUser(authentication)));
 	}
 	

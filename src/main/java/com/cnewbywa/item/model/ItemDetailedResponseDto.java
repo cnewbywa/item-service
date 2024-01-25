@@ -15,12 +15,15 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemResponseDto implements Serializable {
+public class ItemDetailedResponseDto implements Serializable {
 
-	private static final long serialVersionUID = 5394128128404678166L;
-	
+	private static final long serialVersionUID = 2459818151898933730L;
+
 	private UUID id;
 	private String name;
+	private String description;
 	private Instant createTime;
+	private Instant updateTime;
 	private String createdBy;
+	private String modifiedBy;
 }
