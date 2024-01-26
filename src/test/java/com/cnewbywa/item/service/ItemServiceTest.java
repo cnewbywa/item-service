@@ -23,9 +23,9 @@ import org.springframework.data.domain.Sort;
 import com.cnewbywa.item.error.ItemNotFoundException;
 import com.cnewbywa.item.model.Item;
 import com.cnewbywa.item.model.ItemAction;
+import com.cnewbywa.item.model.ItemDetailedResponseDto;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
-import com.cnewbywa.item.model.ItemResponseDto;
 import com.cnewbywa.item.repository.ItemRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +49,7 @@ class ItemServiceTest {
 		
 		Mockito.when(itemRepository.findByItemId(item1Id)).thenReturn(Optional.of(dbItem));
 		
-		ItemResponseDto returnedItem = itemService.getItem(item1Id);
+		ItemDetailedResponseDto returnedItem = itemService.getItem(item1Id);
 		
 		Assertions.assertNotNull(returnedItem);
 		Assertions.assertEquals(item1Id, returnedItem.getId());
@@ -131,7 +131,7 @@ class ItemServiceTest {
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
-		ItemResponseDto response = itemService.addItem(itemDto, "user1");
+		ItemDetailedResponseDto response = itemService.addItem(itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(item1Id, response.getId());
@@ -154,7 +154,7 @@ class ItemServiceTest {
 		
 		ItemDto itemDto = new ItemDto("Item 1", "Description of item 1");
 		
-		ItemResponseDto response = itemService.updateItem(item1Id, itemDto, "user1");
+		ItemDetailedResponseDto response = itemService.updateItem(item1Id, itemDto, "user1");
 		
 		Assertions.assertNotNull(response);
 		Assertions.assertEquals(item1Id, response.getId());

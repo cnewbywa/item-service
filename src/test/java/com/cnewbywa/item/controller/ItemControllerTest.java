@@ -24,6 +24,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
+import com.cnewbywa.item.model.ItemDetailedResponseDto;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
@@ -43,16 +44,16 @@ class ItemControllerTest {
 	
 	@Test
 	void testGetItem_Success() {
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").build();
+		ItemDetailedResponseDto response = ItemDetailedResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").build();
 		
 		Mockito.when(itemService.getItem(item1Id)).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.getIrem(item1Id);
+		ResponseEntity<ItemDetailedResponseDto> responseEntity = itemController.getIrem(item1Id);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Assertions.assertNotNull(responseEntity.getBody());
-		assertResponseDto(response, responseEntity.getBody());
+		assertDetailedResponseDto(response, responseEntity.getBody());
 		
 		Mockito.verify(itemService).getItem(item1Id);
 	}
@@ -73,8 +74,8 @@ class ItemControllerTest {
 	void testGetItems_Success() {
 		Pageable pageable = PageRequest.of(0, 2);
 		
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").build();
-		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").createTime(Instant.now()).build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").createTime(Instant.now()).build();
 		
 		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
 		
@@ -117,8 +118,8 @@ class ItemControllerTest {
 	void testGetItemsByUser_Success() {
 		Pageable pageable = PageRequest.of(0, 2);
 		
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").createdBy("test-user-id").build();
-		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").createdBy("test-user-id").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").createTime(Instant.now()).createdBy("test-user-id").build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").createTime(Instant.now()).createdBy("test-user-id").build();
 		
 		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
 		
@@ -161,8 +162,8 @@ class ItemControllerTest {
 	void testGetItemsByLoggedInUser_Success() {
 		Pageable pageable = PageRequest.of(0, 2);
 		
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").description("Description for item 1").createdBy("test-user-id").build();
-		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").description("Description for item 2").createdBy("test-user-id").build();
+		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 1").createTime(Instant.now()).createdBy("test-user-id").build();
+		ItemResponseDto response2 = ItemResponseDto.builder().id(item2Id).name("Item 2").createTime(Instant.now()).createdBy("test-user-id").build();
 		
 		ItemListResponseDto listResponse = ItemListResponseDto.builder().items(Arrays.asList(response, response2)).amount(2).totalAmount(2).build();
 		
@@ -203,18 +204,18 @@ class ItemControllerTest {
 	
 	@Test
 	void testAddItem() {
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 2").description("Description for item 2").build();
+		ItemDetailedResponseDto response = ItemDetailedResponseDto.builder().id(item1Id).name("Item 2").description("Description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "Description for item 2");
 		
 		Mockito.when(itemService.addItem(input, "test-user-id")).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.addItem(createAuthentication("test-user-id"), input);
+		ResponseEntity<ItemDetailedResponseDto> responseEntity = itemController.addItem(createAuthentication("test-user-id"), input);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		Assertions.assertNotNull(responseEntity.getBody());
-		assertResponseDto(response, responseEntity.getBody());
+		assertDetailedResponseDto(response, responseEntity.getBody());
 		
 		Mockito.verify(itemService).addItem(input, "test-user-id");
 	}
@@ -239,18 +240,18 @@ class ItemControllerTest {
 	
 	@Test
 	void testUpdateItem() {
-		ItemResponseDto response = ItemResponseDto.builder().id(item1Id).name("Item 2").description("New description for item 2").build();
+		ItemDetailedResponseDto response = ItemDetailedResponseDto.builder().id(item1Id).name("Item 2").description("New description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "New description for item 2");
 		
 		Mockito.when(itemService.updateItem(item2Id, input, "test-user-id")).thenReturn(response);
 		
-		ResponseEntity<ItemResponseDto> responseEntity = itemController.updateItem(createAuthentication("test-user-id"), item2Id, input);
+		ResponseEntity<ItemDetailedResponseDto> responseEntity = itemController.updateItem(createAuthentication("test-user-id"), item2Id, input);
 		
 		Assertions.assertNotNull(responseEntity);
 		Assertions.assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		Assertions.assertNotNull(responseEntity.getBody());
-		assertResponseDto(response, responseEntity.getBody());
+		assertDetailedResponseDto(response, responseEntity.getBody());
 		
 		Mockito.verify(itemService).updateItem(item2Id, input, "test-user-id");
 	}
@@ -300,10 +301,16 @@ class ItemControllerTest {
 		Mockito.verify(itemService, Mockito.never()).deleteItem(Mockito.any(UUID.class), Mockito.anyString());
 	}
 	
-	private void assertResponseDto(ItemResponseDto expectedResponse, ItemResponseDto actualResponse) {
+	private void assertDetailedResponseDto(ItemDetailedResponseDto expectedResponse, ItemDetailedResponseDto actualResponse) {
 		Assertions.assertEquals(expectedResponse.getId(), actualResponse.getId());
 		Assertions.assertEquals(expectedResponse.getName(), actualResponse.getName());
 		Assertions.assertEquals(expectedResponse.getDescription(), actualResponse.getDescription());
+	}
+	
+	private void assertResponseDto(ItemResponseDto expectedResponse, ItemResponseDto actualResponse) {
+		Assertions.assertEquals(expectedResponse.getId(), actualResponse.getId());
+		Assertions.assertEquals(expectedResponse.getName(), actualResponse.getName());
+		Assertions.assertNotNull(actualResponse.getCreateTime());
 	}
 	
 	private Authentication createAuthentication(String user) {

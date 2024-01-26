@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.cnewbywa.item.error.ItemNotFoundException;
 import com.cnewbywa.item.model.Item;
 import com.cnewbywa.item.model.ItemAction;
+import com.cnewbywa.item.model.ItemDetailedResponseDto;
 import com.cnewbywa.item.model.ItemDto;
 import com.cnewbywa.item.model.ItemListResponseDto;
 import com.cnewbywa.item.model.ItemResponseDto;
@@ -38,10 +39,10 @@ public class ItemService {
     private EventSender eventSender;
 	
 	@Cacheable("item")
-	public ItemResponseDto getItem(UUID id) {
+	public ItemDetailedResponseDto getItem(UUID id) {
 		Item item = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
-		return createResponseDto(item);
+		return createDetailedResponseDto(item);
 	}
 	
 	@Cacheable("items")
@@ -62,18 +63,18 @@ public class ItemService {
 		return ItemListResponseDto.builder().amount(page.getNumberOfElements()).totalAmount(page.getTotalElements()).items(responses).build();
 	}
 	
-	public ItemResponseDto addItem(ItemDto itemDto, String user) {
+	public ItemDetailedResponseDto addItem(ItemDto itemDto, String user) {
 		log.debug("User: " + user);
 		
 		Item item = itemRepository.save(Item.builder().name(itemDto.getName()).description(itemDto.getDescription()).build());
 		
 		eventSender.sendEvent(item.getItemId(), ItemAction.ADD, MessageFormat.format(EVENT_MESSAGE__ADD, item.getItemId()));
 		
-		return createResponseDto(item);
+		return createDetailedResponseDto(item);
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
-	public ItemResponseDto updateItem(UUID id, ItemDto itemDto, String user) {
+	public ItemDetailedResponseDto updateItem(UUID id, ItemDto itemDto, String user) {
 		Item dbItem = itemRepository.findByItemId(id).orElseThrow(() -> new ItemNotFoundException("Item not found"));
 		
 		dbItem.setName(itemDto.getName());
@@ -83,7 +84,7 @@ public class ItemService {
 		
 		eventSender.sendEvent(id, ItemAction.MODIFY, MessageFormat.format(EVENT_MESSAGE__MODIFY, id));
 		
-		return createResponseDto(item);
+		return createDetailedResponseDto(item);
 	}
 	
 	@CacheEvict(value = "item", key = "#id")
@@ -93,8 +94,8 @@ public class ItemService {
 		eventSender.sendEvent(id, ItemAction.DELETE, MessageFormat.format(EVENT_MESSAGE__DELETE, id));
 	}
 	
-	private ItemResponseDto createResponseDto(Item item) {
-		return ItemResponseDto.builder()
+	private ItemDetailedResponseDto createDetailedResponseDto(Item item) {
+		return ItemDetailedResponseDto.builder()
 				.id(item.getItemId())
 				.name(item.getName())
 				.description(item.getDescription())
@@ -102,5 +103,13 @@ public class ItemService {
 				.updateTime(item.getUpdateTime())
 				.createdBy(item.getCreatedBy())
 				.modifiedBy(item.getModifiedBy()).build();
+	}
+	
+	private ItemResponseDto createResponseDto(Item item) {
+		return ItemResponseDto.builder()
+				.id(item.getItemId())
+				.name(item.getName())
+				.createTime(item.getCreateTime())
+				.createdBy(item.getCreatedBy()).build();
 	}
 }
