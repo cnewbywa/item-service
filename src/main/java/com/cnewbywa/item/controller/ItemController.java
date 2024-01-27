@@ -1,5 +1,6 @@
 package com.cnewbywa.item.controller;
 
+import java.net.URI;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -65,14 +67,21 @@ public class ItemController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemDetailedResponseDto> addItem(Authentication authentication, @RequestBody @Nonnull ItemDto item) {
-		return new ResponseEntity<>(itemService.addItem(item, getLoggedInUser(authentication)), HttpStatus.CREATED);
+		ItemDetailedResponseDto dto = itemService.addItem(item, getLoggedInUser(authentication));
+		
+		HttpHeaders responseHeaders = new HttpHeaders();
+	    responseHeaders.set(HttpHeaders.LOCATION, createAddLocation(dto.getId()).toString());
+		
+		return new ResponseEntity<>(dto, responseHeaders, HttpStatus.CREATED);
 	}
 	
 	@PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(HttpStatus.OK)
 	@SecurityRequirement(name = "bearerAuth")
 	public ResponseEntity<ItemDetailedResponseDto> updateItem(Authentication authentication, @PathVariable UUID id, @RequestBody @Nonnull ItemDto item) {
-		return ResponseEntity.ok(itemService.updateItem(id, item, getLoggedInUser(authentication)));
+		return ResponseEntity.ok()
+				.headers(headers -> headers.setLocation(createUpdateLocation()))
+				.body(itemService.updateItem(id, item, getLoggedInUser(authentication)));
 	}
 	
 	@DeleteMapping(path = "/{id}")
@@ -90,5 +99,20 @@ public class ItemController {
 		}
 		
 		return authentication.getName();
+	}
+	
+	private URI createAddLocation(UUID id) {
+		return ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id.toString())
+                .toUri();
+	}
+	
+	private URI createUpdateLocation() {
+		return ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .build()
+                .toUri();
 	}
 }

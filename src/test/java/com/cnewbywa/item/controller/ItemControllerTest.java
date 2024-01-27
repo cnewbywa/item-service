@@ -18,10 +18,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cnewbywa.item.error.ItemNotFoundException;
 import com.cnewbywa.item.model.ItemDetailedResponseDto;
@@ -35,6 +39,9 @@ class ItemControllerTest {
 
 	@Mock
 	private ItemService itemService;
+	
+	@Mock
+	private ServletUriComponentsBuilder servletUriComponentsBuilder;
 	
 	@InjectMocks
 	private ItemController itemController;
@@ -204,6 +211,8 @@ class ItemControllerTest {
 	
 	@Test
 	void testAddItem() {
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
+        
 		ItemDetailedResponseDto response = ItemDetailedResponseDto.builder().id(item1Id).name("Item 2").description("Description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "Description for item 2");
@@ -240,6 +249,8 @@ class ItemControllerTest {
 	
 	@Test
 	void testUpdateItem() {
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
+		
 		ItemDetailedResponseDto response = ItemDetailedResponseDto.builder().id(item1Id).name("Item 2").description("New description for item 2").build();
 		
 		ItemDto input = new ItemDto("Item 2", "New description for item 2");
@@ -258,6 +269,8 @@ class ItemControllerTest {
 	
 	@Test
 	void testUpdateItem_NoLoggedInUser() {
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
+		
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
 			itemController.updateItem(null, item1Id, null);
 	    });
@@ -267,6 +280,8 @@ class ItemControllerTest {
 	
 	@Test
 	void testUpdateItem_NoLoggedInUser2() {
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(new MockHttpServletRequest()));
+		
 		Assertions.assertThrows(UsernameNotFoundException.class, () -> {
 			itemController.updateItem(createAuthentication(null), item1Id, null);
 	    });
