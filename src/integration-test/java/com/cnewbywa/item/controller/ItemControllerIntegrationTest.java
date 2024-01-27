@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -217,6 +218,7 @@ public class ItemControllerIntegrationTest {
 			.perform(
 				post("").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isCreated())
+			.andExpect(header().exists(HttpHeaders.LOCATION))
 			.andExpect(jsonPath("$.id").isNotEmpty())
 			.andExpect(jsonPath("$.name").value("Item 3"))
 			.andExpect(jsonPath("$.description").value("Description for item 3"))
@@ -236,6 +238,7 @@ public class ItemControllerIntegrationTest {
 			.perform(
 				put("/b07cea5b-1420-446c-b463-d5167278575f").secure(true).contentType(MediaType.APPLICATION_JSON).content(content).with(SecurityMockMvcRequestPostProcessors.jwt()))
 			.andExpect(status().isOk())
+			.andExpect(header().exists(HttpHeaders.LOCATION))
 			.andExpect(jsonPath("$.id").value("b07cea5b-1420-446c-b463-d5167278575f"))
 			.andExpect(jsonPath("$.description").value("New description for item 2"));
 		
